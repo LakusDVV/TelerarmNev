@@ -1,6 +1,7 @@
 import asyncio
 import dotenv
 import os
+import requests
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
@@ -34,6 +35,16 @@ async def echo_handler(message: Message) -> None:
         # But not all the types is supported to be copied so need to handle it
         await message.answer("Nice try!")
 
+@dp.message(Command("cat"))
+async def get_cat_image(message: Message) -> None:
+    try:
+        response = requests.get("https://api.thecatapi.com/v1/images/search")
+        response.raise_for_status()  # Проверяем, что ответ успешен
+        data = response.json()
+        cat_url = data[0]["url"]
+        await message.answer_photo(photo=cat_url)
+    except Exception as e:
+        await message.answer("Не удалось получить кота :(")
 
 
 
